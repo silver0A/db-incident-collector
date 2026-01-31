@@ -5,8 +5,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const logger = require('./logger');
-const { serializeSnapshot } = require('./dbCollector');
+const logger = require('../utils/logger');
+const { serializeSnapshot } = require('../utils/serializeSnapshot');
 
 class LocalFileSaver {
   /**

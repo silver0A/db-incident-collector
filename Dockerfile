@@ -15,7 +15,7 @@ COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install --frozen-lockfile --prod
 
 # 애플리케이션 복사
-COPY *.js ./
+COPY src/ ./src/
 
 # 헬스체크
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
@@ -23,4 +23,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 # 실행
 EXPOSE 8000
-CMD ["node", "app.js"]
+CMD ["node", "src/server.js"]

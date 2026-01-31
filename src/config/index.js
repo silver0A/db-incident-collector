@@ -3,7 +3,8 @@
  */
 
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+// __dirname이 src/config/이므로 프로젝트 루트의 .env를 찾기 위해 두 단계 상위로 이동
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 const settings = {
   // DB 설정

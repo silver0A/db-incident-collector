@@ -4,8 +4,8 @@
  */
 
 const { S3Client, PutObjectCommand, HeadBucketCommand } = require('@aws-sdk/client-s3');
-const logger = require('./logger');
-const { serializeSnapshot } = require('./dbCollector');
+const logger = require('../utils/logger');
+const { serializeSnapshot } = require('../utils/serializeSnapshot');
 
 class S3Uploader {
   /**
