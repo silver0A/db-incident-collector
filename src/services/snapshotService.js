@@ -4,9 +4,9 @@
 
 const settings = require('../config');
 const logger = require('../utils/logger');
-const { DBSnapshotCollector } = require('./dbCollector');
-const S3Uploader = require('./s3Uploader');
-const LocalFileSaver = require('./localSaver');
+const { DBSnapshotCollector } = require('../models/dbCollector');
+const S3Uploader = require('../models/s3Uploader');
+const LocalFileSaver = require('../models/localSaver');
 
 /**
  * 스냅샷을 로컬 파일로 저장
