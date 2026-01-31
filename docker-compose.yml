@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  alert-receiver:
+    build: .
+    container_name: db-incident-collector
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # 컨테이너 내부 경로로 오버라이드
+      - LOCAL_SNAPSHOT_DIR=/app/snapshots
+
+    # 로컬 저장 시 호스트에 마운트
+    volumes:
+      - ./snapshots:/app/snapshots
+
+    # EC2 IAM Role 사용을 위한 설정
+    # EC2 메타데이터 서비스 접근 허용
+    extra_hosts:
+      - "169.254.169.254:169.254.169.254"
+
+    restart: unless-stopped
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

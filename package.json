@@ -1,0 +1,17 @@
+{
+  "name": "db-incident-collector",
+  "version": "1.0.0",
+  "description": "Grafana Alert Receiver - DB 장애 시 자동으로 스냅샷을 수집하여 S3에 저장",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql2": "^3.9.1",
+    "@aws-sdk/client-s3": "^3.504.0",
+    "dotenv": "^16.4.1",
+    "winston": "^3.11.0"
+  }
+}
