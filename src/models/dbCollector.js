@@ -5,6 +5,7 @@
 
 const mysql = require('mysql2/promise');
 const logger = require('../utils/logger');
+const { toKSTString } = require('../utils/dateUtils');
 
 class DBSnapshotCollector {
   /**
@@ -195,7 +196,7 @@ class DBSnapshotCollector {
   /** 모든 스냅샷 정보 수집 */
   async collectAll() {
     const snapshot = {
-      collected_at: new Date().toISOString(),
+      collected_at: toKSTString(),
       db_type: 'MariaDB',
     };
 

@@ -5,6 +5,7 @@
 const settings = require('../config');
 const { getDbConfig } = require('../config');
 const logger = require('../utils/logger');
+const { getKSTDateParts } = require('../utils/dateUtils');
 const { DBSnapshotCollector } = require('../models/dbCollector');
 const S3Uploader = require('../models/s3Uploader');
 const LocalFileSaver = require('../models/localSaver');
@@ -43,13 +44,13 @@ async function uploadSnapshotToS3(snapshot, filename) {
   logger.info('Uploading snapshot to S3');
   const uploader = new S3Uploader(settings.s3Bucket, settings.awsRegion);
 
-  // 파일 경로: db-snapshots/YYYY/MM/DD/{alert_name}_{timestamp}.json
-  const s3Now = new Date();
+  // 파일 경로: db-snapshots/YYYY/MM/DD/{alert_name}_{timestamp}.json (KST 기준)
+  const s3Kst = getKSTDateParts();
   const s3Key = [
     'db-snapshots',
-    s3Now.getFullYear(),
-    String(s3Now.getMonth() + 1).padStart(2, '0'),
-    String(s3Now.getDate()).padStart(2, '0'),
+    s3Kst.year,
+    s3Kst.month,
+    s3Kst.day,
     `${filename}.json`,
   ].join('/');
 
@@ -64,16 +65,8 @@ async function uploadSnapshotToS3(snapshot, filename) {
  * @param {string|null} application 애플리케이션 식별자 (예: "dev", "stg")
  */
 async function collectAndUpload(alertName, alertData, application = null) {
-  const now = new Date();
-  const timestamp = [
-    now.getFullYear(),
-    String(now.getMonth() + 1).padStart(2, '0'),
-    String(now.getDate()).padStart(2, '0'),
-    '_',
-    String(now.getHours()).padStart(2, '0'),
-    String(now.getMinutes()).padStart(2, '0'),
-    String(now.getSeconds()).padStart(2, '0'),
-  ].join('');
+  const kst = getKSTDateParts();
+  const timestamp = `${kst.year}${kst.month}${kst.day}_${kst.hour}${kst.minute}${kst.second}`;
 
   // 파일명: {application}_{alertName}_{timestamp} 또는 {alertName}_{timestamp}
   const prefix = application ? `${application}_` : '';

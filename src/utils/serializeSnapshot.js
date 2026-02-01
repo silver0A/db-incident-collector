@@ -2,12 +2,14 @@
  * 스냅샷 데이터를 JSON 직렬화 가능한 형태로 변환
  * datetime, Buffer 등을 문자열로 변환
  */
+const { toKSTString } = require('./dateUtils');
+
 function serializeSnapshot(obj) {
   if (obj === null || obj === undefined) {
     return obj;
   }
   if (obj instanceof Date) {
-    return obj.toISOString();
+    return toKSTString(obj);
   }
   if (Buffer.isBuffer(obj)) {
     return obj.toString('utf-8');

@@ -3,11 +3,12 @@
  */
 
 const winston = require('winston');
+const { getKSTTimestampForLogger } = require('./dateUtils');
 
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    winston.format.timestamp({ format: getKSTTimestampForLogger }),
     winston.format.printf(({ timestamp, level, message }) => {
       return `${timestamp} - ${level.toUpperCase()} - ${message}`;
     })

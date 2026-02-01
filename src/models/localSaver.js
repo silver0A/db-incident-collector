@@ -6,6 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 const logger = require('../utils/logger');
+const { getKSTDateParts } = require('../utils/dateUtils');
 const { serializeSnapshot } = require('../utils/serializeSnapshot');
 
 class LocalFileSaver {
@@ -34,14 +35,9 @@ class LocalFileSaver {
     try {
       const serializedData = serializeSnapshot(data);
 
-      // 날짜별 하위 디렉토리 생성
-      const now = new Date();
-      const dateDir = path.join(
-        this.baseDir,
-        String(now.getFullYear()),
-        String(now.getMonth() + 1).padStart(2, '0'),
-        String(now.getDate()).padStart(2, '0')
-      );
+      // 날짜별 하위 디렉토리 생성 (KST 기준)
+      const kst = getKSTDateParts();
+      const dateDir = path.join(this.baseDir, kst.year, kst.month, kst.day);
       fs.mkdirSync(dateDir, { recursive: true });
 
       // 파일 경로
@@ -68,14 +64,9 @@ class LocalFileSaver {
     try {
       const serializedData = serializeSnapshot(data);
 
-      // 날짜별 하위 디렉토리 생성
-      const now = new Date();
-      const dateDir = path.join(
-        this.baseDir,
-        String(now.getFullYear()),
-        String(now.getMonth() + 1).padStart(2, '0'),
-        String(now.getDate()).padStart(2, '0')
-      );
+      // 날짜별 하위 디렉토리 생성 (KST 기준)
+      const kst = getKSTDateParts();
+      const dateDir = path.join(this.baseDir, kst.year, kst.month, kst.day);
       fs.mkdirSync(dateDir, { recursive: true });
 
       // 파일 경로
