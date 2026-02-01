@@ -20,9 +20,10 @@ function handleGrafanaWebhook(req, res) {
       if (status === 'firing') {
         for (const alert of payload.alerts) {
           const alertName = (alert.labels && alert.labels.alertname) || 'unknown';
-          logger.info(`Alert firing: ${alertName}`);
+          const application = (alert.labels && alert.labels.application) || null;
+          logger.info(`Alert firing: ${alertName}, application: ${application || 'unknown'}`);
           // 백그라운드에서 실행 (응답을 블로킹하지 않음)
-          collectAndUpload(alertName, payload);
+          collectAndUpload(alertName, payload, application);
         }
       }
     }
@@ -48,10 +49,13 @@ function handleGrafanaWebhook(req, res) {
 
 /**
  * POST /test/collect - 테스트용 수동 수집 트리거
+ * body.application으로 대상 환경 지정 가능 (기본값: 'dev')
  */
-function handleTestCollect(_req, res) {
-  collectAndUpload('manual_test', { test: true });
-  res.json({ status: 'ok', message: 'Collection triggered' });
+function handleTestCollect(req, res) {
+  const application = (req.body && req.body.application) || 'dev';
+  logger.info(`Test collection triggered for application: ${application}`);
+  collectAndUpload('manual_test', { test: true }, application);
+  res.json({ status: 'ok', message: 'Collection triggered', application });
 }
 
 module.exports = { handleGrafanaWebhook, handleTestCollect };

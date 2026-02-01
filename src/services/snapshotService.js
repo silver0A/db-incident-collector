@@ -3,6 +3,7 @@
  */
 
 const settings = require('../config');
+const { getDbConfig } = require('../config');
 const logger = require('../utils/logger');
 const { DBSnapshotCollector } = require('../models/dbCollector');
 const S3Uploader = require('../models/s3Uploader');
@@ -60,8 +61,9 @@ async function uploadSnapshotToS3(snapshot, filename) {
  * 백그라운드에서 DB 스냅샷 수집 및 저장 (S3/로컬)
  * @param {string} alertName 알림 이름
  * @param {Object} alertData 알림 원본 데이터
+ * @param {string|null} application 애플리케이션 식별자 (예: "dev", "stg")
  */
-async function collectAndUpload(alertName, alertData) {
+async function collectAndUpload(alertName, alertData, application = null) {
   const now = new Date();
   const timestamp = [
     now.getFullYear(),
@@ -72,22 +74,29 @@ async function collectAndUpload(alertName, alertData) {
     String(now.getMinutes()).padStart(2, '0'),
     String(now.getSeconds()).padStart(2, '0'),
   ].join('');
-  const filename = `${alertName}_${timestamp}`;
+
+  // 파일명: {application}_{alertName}_{timestamp} 또는 {alertName}_{timestamp}
+  const prefix = application ? `${application}_` : '';
+  const filename = `${prefix}${alertName}_${timestamp}`;
+
+  // 애플리케이션별 DB 접속 정보 조회
+  const dbConfig = getDbConfig(application);
+  if (!dbConfig) {
+    logger.error(`DB config not found for application: ${application}. Skipping snapshot collection.`);
+    return;
+  }
 
   try {
     // DB 스냅샷 수집
-    logger.info(`Starting DB snapshot collection for alert: ${alertName}`);
-    const collector = new DBSnapshotCollector({
-      host: settings.dbHost,
-      port: settings.dbPort,
-      user: settings.dbUser,
-      password: settings.dbPassword,
-      database: settings.dbName,
-    });
+    logger.info(
+      `Starting DB snapshot collection for alert: ${alertName}, application: ${application || 'default'}, db host: ${dbConfig.host}`
+    );
+    const collector = new DBSnapshotCollector(dbConfig);
 
     const snapshot = await collector.collectAll();
     snapshot.alert_info = {
       name: alertName,
+      application: application || 'default',
       triggered_at: timestamp,
       raw_data: alertData,
     };

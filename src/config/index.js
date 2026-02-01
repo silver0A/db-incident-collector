@@ -30,4 +30,41 @@ const settings = {
   serverPort: parseInt(process.env.SERVER_PORT, 10) || 8000,
 };
 
+/**
+ * 애플리케이션(환경)별 DB 접속 정보를 반환
+ * 환경변수 규칙: DB_{APP_UPPER}_HOST, DB_{APP_UPPER}_PORT, ...
+ * - application이 null이면 기본 DB 설정 반환
+ * - application이 있지만 해당 환경변수가 없으면 null 반환 (수집 차단)
+ *
+ * @param {string|null} application 애플리케이션 식별자 (예: "dev", "stg")
+ * @returns {{ host: string, port: number, user: string, password: string, database: string|null }|null}
+ */
+function getDbConfig(application) {
+  // application이 없으면 기본 DB 설정 사용
+  if (!application) {
+    return {
+      host: settings.dbHost,
+      port: settings.dbPort,
+      user: settings.dbUser,
+      password: settings.dbPassword,
+      database: settings.dbName,
+    };
+  }
+
+  const prefix = `DB_${application.toUpperCase()}_`;
+  const appHost = process.env[`${prefix}HOST`];
+
+  // 미설정 application → null 반환 (수집 차단)
+  if (!appHost) return null;
+
+  return {
+    host: appHost,
+    port: parseInt(process.env[`${prefix}PORT`], 10) || settings.dbPort,
+    user: process.env[`${prefix}USER`] || settings.dbUser,
+    password: process.env[`${prefix}PASSWORD`] || settings.dbPassword,
+    database: process.env[`${prefix}NAME`] || settings.dbName,
+  };
+}
+
 module.exports = settings;
+module.exports.getDbConfig = getDbConfig;
