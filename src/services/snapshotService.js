@@ -47,7 +47,7 @@ async function uploadSnapshotToS3(snapshot, filename) {
   // 파일 경로: db-snapshots/YYYY/MM/DD/{alert_name}_{timestamp}.json (KST 기준)
   const s3Kst = getKSTDateParts();
   const s3Key = [
-    'db-snapshots',
+    settings.s3KeyPrefix,
     s3Kst.year,
     s3Kst.month,
     s3Kst.day,

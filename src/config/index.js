@@ -23,6 +23,7 @@ const settings = {
 
   // S3 설정
   s3Bucket: process.env.S3_BUCKET || 'your-incident-bucket',
+  s3KeyPrefix: process.env.S3_KEY_PREFIX || 'db-snapshots',
   awsRegion: process.env.AWS_REGION || 'ap-northeast-2',
 
   // 서버 설정
